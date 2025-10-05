@@ -1,1 +1,35 @@
+name: Sync OpenClash and Passwall
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 每天 00:00 UTC 自动执行一次（你可以调整为其他时间）
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "your-username"
+        git config --global user.email "your-email@example.com"
+      
+    - name: Add upstream OpenClash repository
+      run: |
+        git remote add openclash https://github.com/openclash/openclash.git
+        git fetch openclash
+        git merge openclash/master --allow-unrelated-histories -m "Sync OpenClash"
+
+    - name: Add upstream Passwall repository
+      run: |
+        git remote add passwall https://github.com/xiaorouji/openwrt-passwall.git
+        git fetch passwall
+        git merge passwall/master --allow-unrelated-histories -m "Sync Passwall"
+
+    - name: Push changes to your repository
+      run: |
+        git push origin master
 
