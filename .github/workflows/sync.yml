@@ -14,8 +14,8 @@ jobs:
 
     - name: Set up Git
       run: |
-        git config --global user.name "your-username"
-        git config --global user.email "your-email@example.com"
+        git config --global user.name "hztbhtbh"
+        git config --global user.email "hztbhtbh@hotmail.com"
       
     - name: Add upstream OpenClash repository
       run: |
