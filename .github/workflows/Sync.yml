@@ -29,12 +29,12 @@ jobs:
           git sparse-checkout set luci-app-openclash
           echo "luci-app-openclash ready."
 
-      # 同步 luci-app-passwall
+      # 同步 luci-app-passwall（修改后的地址）
       - name: Initialize sparse-checkout for luci-app-passwall
         run: |
           echo "Syncing luci-app-passwall..."
           rm -rf upstream-passwall
-          git clone --depth=1 --filter=blob:none --sparse https://github.com/xiaorouji/openwrt-passwall.git upstream-passwall
+          git clone --depth=1 --filter=blob:none --sparse https://github.com/Openwrt-Passwall/openwrt-passwall.git upstream-passwall
           cd upstream-passwall
           git sparse-checkout set luci-app-passwall
           echo "luci-app-passwall ready."
