@@ -9,38 +9,43 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repo
+      # 1. 检出当前仓库
+      - name: Checkout current repo
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
+      # 2. 配置 Git 用户信息
       - name: Configure Git
         run: |
           git config --global user.name "hatbhtbh"
           git config --global user.email "hatbhtbh@gmail.com"
 
-      # 同步 luci-app-openclash
-      - name: Initialize sparse-checkout for luci-app-openclash
-        run: |
-          echo "Syncing luci-app-openclash..."
-          rm -rf upstream-openclash
-          git clone --depth=1 --filter=blob:none --sparse https://github.com/vernesong/OpenClash.git upstream-openclash
-          cd upstream-openclash
-          git sparse-checkout set luci-app-openclash
-          echo "luci-app-openclash ready."
+      # 3. 检出 OpenClash 子目录
+      - name: Checkout OpenClash luci-app-openclash
+        uses: actions/checkout@v4
+        with:
+          repository: vernesong/OpenClash
+          ref: master
+          path: upstream-openclash
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sparse-checkout: |
+            luci-app-openclash
 
-      # 同步 luci-app-passwall（修改后的地址）
-      - name: Initialize sparse-checkout for luci-app-passwall
-        run: |
-          echo "Syncing luci-app-passwall..."
-          rm -rf upstream-passwall
-          git clone --depth=1 --filter=blob:none --sparse https://github.com/Openwrt-Passwall/openwrt-passwall.git upstream-passwall
-          cd upstream-passwall
-          git sparse-checkout set luci-app-passwall
-          echo "luci-app-passwall ready."
+      # 4. 检出 Passwall 子目录（改用新地址）
+      - name: Checkout Passwall luci-app-passwall
+        uses: actions/checkout@v4
+        with:
+          repository: Openwrt-Passwall/openwrt-passwall
+          ref: main
+          path: upstream-passwall
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sparse-checkout: |
+            luci-app-passwall
 
-      # 删除旧目录并同步新的目录
-      - name: Copy target directories to applications
+      # 5. 复制目录到 applications
+      - name: Copy target directories
         run: |
           echo "Copying directories to applications..."
           rm -rf applications/luci-app-openclash applications/luci-app-passwall
@@ -48,19 +53,17 @@ jobs:
           cp -r upstream-passwall/luci-app-passwall applications/luci-app-passwall
           echo "Directories copied successfully."
 
-      # 提交并推送更改（带日志）
+      # 6. 提交并推送更改（稳妥版）
       - name: Commit and Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Checking for changes..."
           git add applications/luci-app-openclash applications/luci-app-passwall
-          git diff --cached --quiet
-          if [ $? -eq 0 ]; then
+          if git diff --cached --quiet; then
             echo "No changes detected. Nothing to commit."
           else
             echo "Changes detected. Committing and pushing..."
             git commit -m "Sync luci-app-openclash and luci-app-passwall from upstream"
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:master
             echo "Commit and push completed."
-          fi
