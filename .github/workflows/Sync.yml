@@ -9,6 +9,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+
       # 1. 检出当前仓库
       - name: Checkout current repo
         uses: actions/checkout@v4
@@ -33,7 +34,7 @@ jobs:
           sparse-checkout: |
             luci-app-openclash
 
-      # 4. 检出 Passwall 子目录（改用新地址）
+      # 4. 检出 Passwall 子目录
       - name: Checkout Passwall luci-app-passwall
         uses: actions/checkout@v4
         with:
