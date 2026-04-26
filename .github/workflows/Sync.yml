@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vernesong/OpenClash
-          ref: v0.47.075
+          ref: v0.47.055
           path: upstream-openclash
           token: ${{ secrets.GITHUB_TOKEN }}
           sparse-checkout: |
