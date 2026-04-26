@@ -23,18 +23,18 @@ jobs:
           git config --global user.name "hatbhtbh"
           git config --global user.email "hatbhtbh@gmail.com"
 
-      # 3. 检出 OpenClash 子目录
+      # 3. 检出 OpenClash luci-app-openclash（锁定版本）
       - name: Checkout OpenClash luci-app-openclash
         uses: actions/checkout@v4
         with:
           repository: vernesong/OpenClash
-          ref: master
+          ref: v0.47.075
           path: upstream-openclash
           token: ${{ secrets.GITHUB_TOKEN }}
           sparse-checkout: |
             luci-app-openclash
 
-      # 4. 检出 Passwall 子目录
+      # 4. 检出 Passwall 子目录（保持最新，不修改）
       - name: Checkout Passwall luci-app-passwall
         uses: actions/checkout@v4
         with:
@@ -65,7 +65,7 @@ jobs:
             echo "No changes detected. Nothing to commit."
           else
             echo "Changes detected. Committing and pushing..."
-            git commit -m "Sync luci-app-openclash and luci-app-passwall from upstream"
+            git commit -m "Sync luci-app-openclash v0.47.075 and luci-app-passwall from upstream"
             git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master
             echo "Commit and push completed."
           fi
