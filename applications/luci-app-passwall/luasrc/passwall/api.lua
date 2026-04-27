@@ -457,10 +457,11 @@ function get_valid_nodes()
 	uci:foreach(appname, "nodes", function(e)
 		e.id = e[".name"]
 		if e.type and e.remarks then
-			local type_name = e.type
-			if e.type == "sing-box" then type_name = "Sing-Box" end
-			if e.protocol and (e.protocol == "_balancing" or e.protocol == "_shunt" or e.protocol == "_iface" or e.protocol == "_urltest") then
-				e["remark"] = trim("%s：[%s]" % {type_name .. " " .. i18n.translatef(e.protocol), e.remarks})
+			if (e.type == "sing-box" or e.type == "Xray") and e.protocol and
+			   (e.protocol == "_balancing" or e.protocol == "_shunt" or e.protocol == "_iface" or e.protocol == "_urltest") then
+				local type = e.type
+				if type == "sing-box" then type = "Sing-Box" end
+				e["remark"] = "%s：[%s] " % {type .. " " .. i18n.translatef(e.protocol), e.remarks}
 				e["node_type"] = "special"
 				if not e.group or e.group == "" then
 					default_nodes[#default_nodes + 1] = e
@@ -472,7 +473,8 @@ function get_valid_nodes()
 			if port and e.address then
 				local address = e.address
 				if is_ip(address) or datatypes.hostname(address) then
-					if (e.type == "sing-box" or e.type == "Xray") and e.protocol then
+					local type = e.type
+					if (type == "sing-box" or type == "Xray") and e.protocol then
 						local protocol = e.protocol
 						if protocol == "vmess" then
 							protocol = "VMess"
@@ -495,13 +497,14 @@ function get_valid_nodes()
 						else
 							protocol = protocol:gsub("^%l",string.upper)
 						end
-						type_name = type_name .. " " .. protocol
+						if type == "sing-box" then type = "Sing-Box" end
+						type = type .. " " .. protocol
 					end
 					if is_ipv6(address) then address = get_ipv6_full(address) end
-					e["remark"] = trim("%s：[%s]" % {type_name, e.remarks})
+					e["remark"] = "%s：[%s]" % {type, e.remarks}
 					if show_node_info == "1" then
 						port = port:gsub(":", "-")
-						e["remark"] = trim("%s：[%s] %s:%s" % {type_name, e.remarks, address, port})
+						e["remark"] = "%s：[%s] %s:%s" % {type, e.remarks, address, port}
 					end
 					e.node_type = "normal"
 					if not e.group or e.group == "" then
@@ -521,11 +524,11 @@ end
 function get_node_remarks(n)
 	local remarks = ""
 	if n then
-		local type_name = n.type
-		if n.type == "sing-box" then type_name = "Sing-Box" end
-		if n.protocol and (n.protocol == "_balancing" or n.protocol == "_shunt" or n.protocol == "_iface" or n.protocol == "_urltest") then
-			remarks = trim("%s：[%s]" % {type_name .. " " .. i18n.translatef(n.protocol), n.remarks})
+		if (n.type == "sing-box" or n.type == "Xray") and n.protocol and
+		   (n.protocol == "_balancing" or n.protocol == "_shunt" or n.protocol == "_iface" or n.protocol == "_urltest") then
+			remarks = "%s：[%s] " % {n.type .. " " .. i18n.translatef(n.protocol), n.remarks}
 		else
+			local type2 = n.type
 			if (n.type == "sing-box" or n.type == "Xray") and n.protocol then
 				local protocol = n.protocol
 				if protocol == "vmess" then
@@ -549,9 +552,10 @@ function get_node_remarks(n)
 				else
 					protocol = protocol:gsub("^%l",string.upper)
 				end
-				type_name = type_name .. " " .. protocol
+				if type2 == "sing-box" then type2 = "Sing-Box" end
+				type2 = type2 .. " " .. protocol
 			end
-			remarks = trim("%s：[%s]" % {type_name, n.remarks})
+			remarks = "%s：[%s]" % {type2, n.remarks}
 		end
 	end
 	return remarks

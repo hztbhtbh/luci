@@ -1,10 +1,12 @@
 local m, s = ...
 
+local api = require "luci.passwall.api"
+
 if not api.is_finded("trojan-plus") then
 	return
 end
 
-type_name = "Trojan-Plus"
+local type_name = "Trojan-Plus"
 
 -- [[ Trojan Plus ]]
 

@@ -1,10 +1,12 @@
 local m, s = ...
 
+local api = require "luci.passwall.api"
+
 if not api.finded_com("hysteria") then
 	return
 end
 
-type_name = "Hysteria2"
+local type_name = "Hysteria2"
 
 -- [[ Hysteria2 ]]
 

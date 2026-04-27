@@ -65,14 +65,18 @@ get_geoip() {
 	local geoip_code="$1"
 	local geoip_type_flag=""
 	local geoip_path="${V2RAY_LOCATION_ASSET%*/}/geoip.dat"
-	local bin="$(first_type $(config_t_get global_app geoview_file) geoview)"
-	[ -n "$bin" ] && [ -s "$geoip_path" ] || { echo ""; return 1; }
+	[ -s "$geoip_path" ] || { echo ""; return 1; }
 	case "$2" in
 		"ipv4") geoip_type_flag="-ipv6=false" ;;
 		"ipv6") geoip_type_flag="-ipv4=false" ;;
 	esac
-	"$bin" -input "$geoip_path" -list "$geoip_code" $geoip_type_flag -lowmem=true
-	return 0
+	if type geoview &> /dev/null; then
+		geoview -input "$geoip_path" -list "$geoip_code" $geoip_type_flag -lowmem=true
+		return 0
+	else
+		echo ""
+		return 1
+	fi
 }
 
 get_host_ip() {
