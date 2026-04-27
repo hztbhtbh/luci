@@ -1,9 +1,9 @@
-name: Sync openclash and passwall
+name: Sync openclash and passwall 
 
 on:
   # schedule:
-  #   - cron: "0 0 * * *"   # 每天 0 点运行
-  workflow_dispatch:       # 允许手动触发
+  #   - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -20,32 +20,32 @@ jobs:
       # 2. 配置 Git 用户信息
       - name: Configure Git
         run: |
-          git config --global user.name "hztbhtbh"
-          git config --global user.email "hztbhtbh@hotmail.com"
+          git config --global user.name "hatbhtbh"
+          git config --global user.email "hatbhtbh@gmail.com"
 
-      # 3. 检出 OpenClash luci-app-openclash（锁定版本）
+      # 3. OpenClash（改为指定版本）
       - name: Checkout OpenClash luci-app-openclash
         uses: actions/checkout@v4
         with:
           repository: vernesong/OpenClash
-          ref: v0.47.086
+          ref: v0.47.028
           path: upstream-openclash
           token: ${{ secrets.GITHUB_TOKEN }}
           sparse-checkout: |
             luci-app-openclash
 
-      # 4. 检出 Passwall 子目录（保持最新，不修改）
+      # 4. Passwall（改为指定版本）
       - name: Checkout Passwall luci-app-passwall
         uses: actions/checkout@v4
         with:
           repository: Openwrt-Passwall/openwrt-passwall
-          ref: main
+          ref: 26.1.30-1   # 
           path: upstream-passwall
           token: ${{ secrets.GITHUB_TOKEN }}
           sparse-checkout: |
             luci-app-passwall
 
-      # 5. 复制目录到 applications
+      # 5. 复制目录
       - name: Copy target directories
         run: |
           echo "Copying directories to applications..."
@@ -54,7 +54,7 @@ jobs:
           cp -r upstream-passwall/luci-app-passwall applications/luci-app-passwall
           echo "Directories copied successfully."
 
-      # 6. 提交并推送更改（安全版）
+      # 6. 提交并推送
       - name: Commit and Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,7 +65,7 @@ jobs:
             echo "No changes detected. Nothing to commit."
           else
             echo "Changes detected. Committing and pushing..."
-            git commit -m "Sync openclash and passwall from upstream"
+            git commit -m "Sync openclash and passwall"
             git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master
             echo "Commit and push completed."
           fi
