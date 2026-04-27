@@ -65,7 +65,7 @@ jobs:
             echo "No changes detected. Nothing to commit."
           else
             echo "Changes detected. Committing and pushing..."
-            git commit -m "Sync luci-app-openclash and luci-app-passwall from upstream"
+            git commit -m "Sync openclash and passwall from upstream"
             git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master
             echo "Commit and push completed."
           fi
