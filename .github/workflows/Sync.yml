@@ -23,7 +23,7 @@ jobs:
           git config --global user.name "hztbhtbh"
           git config --global user.email "hztbhtbh@hotmail.com"
 
-      # 3. OpenClash（改为指定版本）
+      # 3. 检测 OpenClash 上游仓库（改为指定版本）
       - name: Checkout OpenClash luci-app-openclash
         uses: actions/checkout@v4
         with:
@@ -34,7 +34,7 @@ jobs:
           sparse-checkout: |
             luci-app-openclash
 
-      # 4. Passwall（改为指定版本）
+      # 4. 检测 Passwall 上游仓库（改为指定版本）
       - name: Checkout Passwall luci-app-passwall
         uses: actions/checkout@v4
         with:
