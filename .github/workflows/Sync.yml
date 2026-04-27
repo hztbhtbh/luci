@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vernesong/OpenClash
-          ref: v0.47.028
+          ref: v0.47.038
           path: upstream-openclash
           token: ${{ secrets.GITHUB_TOKEN }}
           sparse-checkout: |
@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Openwrt-Passwall/openwrt-passwall
-          ref: 26.1.30-1   # 
+          ref: 26.2.6-1
           path: upstream-passwall
           token: ${{ secrets.GITHUB_TOKEN }}
           sparse-checkout: |
