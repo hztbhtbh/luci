@@ -1,4 +1,4 @@
-name: Sync luci-app-openclash and luci-app-passwall
+name: Sync openclash and passwall
 
 on:
   # schedule:
