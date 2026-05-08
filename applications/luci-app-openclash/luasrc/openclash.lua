@@ -31,6 +31,7 @@ local fs	= require "nixio.fs"
 local nutil = require "nixio.util"
 local uci = require "luci.model.uci".cursor()
 local SYS  = require "luci.sys"
+local HTTP = require "luci.http"
 
 local type  = type
 local string  = string
@@ -272,7 +273,7 @@ function filesize(e)
 end
 
 function lanip()
-	local lan_int_name = uci:get("openclash", "config", "lan_interface_name") or "0"
+	local lan_int_name = uci:get("openclash", "@overwrite[0]", "lan_interface_name") or uci:get("openclash", "config", "lan_interface_name") or "0"
 	local lan_ip
 	if lan_int_name == "0" then
 		lan_ip = SYS.exec("uci -q get network.lan.ipaddr 2>/dev/null |awk -F '/' '{print $1}' 2>/dev/null |tr -d '\n'")
@@ -286,4 +287,73 @@ function lanip()
 		lan_ip = SYS.exec("ip addr show 2>/dev/null | grep -w 'inet' | grep 'global' | grep 'brd' | grep -Eo 'inet [0-9\.]+' | awk '{print $2}' | head -n 1 | tr -d '\n'")
 	end
 	return lan_ip
+end
+
+function find_case_insensitive_path(path)
+    local dir = dirname(path)
+    local base = basename(path)
+    local files = dir and fs.dir(dir)
+    if not files then
+        return nil
+    end
+
+    for f in files do
+        if f:lower() == base:lower() then
+            return dir .. "/" .. f
+        end
+    end
+    return nil
+end
+
+function get_resourse_mtime(path)
+    local real_path = path
+    if not fs.access(path) then
+        local found = find_case_insensitive_path(path)
+        if found then
+            real_path = found
+        else
+            return "File Not Exist"
+        end
+    end
+    local file = fs.readlink(real_path) or real_path
+	local resourse_etag_version = SYS.exec(string.format("source /usr/share/openclash/openclash_etag.sh && GET_ETAG_TIMESTAMP_BY_PATH '%s'", real_path))
+    if resourse_etag_version and resourse_etag_version ~= "" then
+		return resourse_etag_version
+	end
+	local resourse_version = os.date("%Y-%m-%d %H:%M:%S", mtime(real_path))
+	if resourse_version and resourse_version ~= "" then
+        return resourse_version
+	end
+    return "Unknown"
+end
+
+function uci_get_config(section, key)
+	local val
+	if section == "config" then
+    	val = uci:get("openclash", "@overwrite[0]", key)
+	end
+    if val == nil then
+    	val = uci:get("openclash", section, key)
+    end
+    return val
+end
+
+function get_file_path_from_request()
+	local file_path
+	local referer = HTTP.getenv("HTTP_REFERER")
+	if referer then
+		local _, _, file_value = referer:find("file=([^&]*)$")
+		if file_value and file_value ~= "" then
+			file_path = HTTP.urldecode(file_value)
+		end
+	end
+
+	if not file_path or file_path == "/" then
+		file_path = HTTP.formvalue("file")
+		if not file_path then
+			file_path = HTTP.urldecode(file_path)
+		end
+	end
+
+	return file_path
 end
