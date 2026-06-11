@@ -21,7 +21,7 @@ jobs:
       - name: Configure Git
         run: |
           git config --global user.name "hztbhtbh"
-          git config --global user.email "hztbhtbh@gmail.com"
+          git config --global user.email "hztbhtbh@hotmail.com"
 
       # 3. 检测 OpenClash 上游仓库（改为指定版本）
       - name: Checkout OpenClash luci-app-openclash
